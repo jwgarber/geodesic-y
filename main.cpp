@@ -90,6 +90,7 @@ int main(const int argc, const char* argv[]) {
         Cell base = 3;
         Player player = Player::Black;
         std::string board_str = "";
+        bool moves = false;
 
         for (int i = 1; i < argc; ++i) {
 
@@ -101,6 +102,8 @@ int main(const int argc, const char* argv[]) {
                 player = parse_player(arg.substr(9));
             } else if (arg.rfind("--board=", 0) == 0) {
                 board_str = arg.substr(8);
+            } else if (arg == "--moves") {
+                moves = true;
             } else {
                 throw std::runtime_error("unknown argument: " + arg);
             }
@@ -114,13 +117,20 @@ int main(const int argc, const char* argv[]) {
                   << " on base " << static_cast<uint32_t>(base) << " board"
                   << std::endl;
 
-        const auto wins = winning_moves(state, game, player);
+        if (moves) {
+            const auto wins = winning_moves(state, game, player);
 
-        std::cout << "Winning moves: ";
-        for (const auto cell : wins) {
-            std::cout << static_cast<uint32_t>(cell) << ' ';
+            std::cout << "Winning moves: ";
+            for (const auto cell : wins) {
+                std::cout << static_cast<uint32_t>(cell) << ' ';
+            }
+            std::cout << std::endl;
+        } else {
+            const auto outcome = winning_outcome(state, game, player);
+
+            std::cout << "Outcome: " << outcome << std::endl;
         }
-        std::cout << std::endl;
+
 
     } catch (const std::runtime_error& err) {
         std::cout << err.what() << std::endl;
