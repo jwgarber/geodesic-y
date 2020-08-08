@@ -38,6 +38,8 @@ static State parse_board(const Cell base, const Game& game, const std::string& b
 
     State state{base};
 
+    std::vector<Player> board{board_size(base), Player::None};
+
     const auto moves = split(board_str, ' ');
 
     for (const auto& move : moves) {
@@ -60,9 +62,21 @@ static State parse_board(const Cell base, const Game& game, const std::string& b
             throw std::runtime_error("invalid position: " + std::to_string(cell));
         }
 
-        state.move(game, player, cell);
-        if (state.won(cell)) {
-            throw std::runtime_error("initial board cannot be won");
+        if (board.at(cell) == !player) {
+            throw std::runtime_error("error: conflicting players for cell " + std::to_string(cell));
+        }
+
+        board.at(cell) = player;
+    }
+
+    for (Cell cell = 0; cell < board.size(); ++cell) {
+        const auto player = board.at(cell);
+        if (player != Player::None) {
+            state.move(game, player, cell);
+
+            if (state.won(cell)) {
+                throw std::runtime_error("error: initial board cannot be won");
+            }
         }
     }
 
@@ -111,5 +125,4 @@ int main(const int argc, const char* argv[]) {
     } catch (const std::runtime_error& err) {
         std::cout << err.what() << std::endl;
     }
-
 }
