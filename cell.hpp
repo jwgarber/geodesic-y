@@ -38,6 +38,13 @@ static inline std::ostream& operator<<(std::ostream& os, const Outcome outcome) 
     }
 }
 
+static inline Outcome operator-(const Outcome outcome) {
+    switch (outcome) {
+        case Outcome::Win: return Outcome::Lose;
+        case Outcome::Lose: return Outcome::Win;
+    }
+}
+
 enum class Edge : uint8_t {
     None = 0x0,
     Right = 0x1,

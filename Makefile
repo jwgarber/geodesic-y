@@ -12,7 +12,7 @@ STD = -std=c++11 -Wno-return-type
 #SAN = -fsanitize=integer,undefined,address -g
 OPTS = -O3 -march=native -flto
 CXXFLAGS = $(STD) $(WARNINGS) $(OPTS) $(SAN)
-#LDLIBS = -lpthread
+LDLIBS = -pthread
 
 SOURCES = $(wildcard *.cpp)
 HEADERS = $(wildcard *.hpp)
