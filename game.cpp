@@ -3,7 +3,8 @@
 #include <algorithm>
 #include <stdexcept>
 
-Game::Game(const Cell base) {
+// The adjacency graph for the board
+static std::vector<std::vector<Cell>> gen_graph(const Cell base) {
 
     std::vector<std::vector<Cell>> neighbors{board_size(base)};
 
@@ -63,16 +64,23 @@ Game::Game(const Cell base) {
         }
     }
 
-    graph = neighbors;
+    auto symmetric = neighbors;
 
     // Make the graph symmetric
     for (Cell i = 0; i < neighbors.size(); ++i) {
         for (const auto j : neighbors.at(i)) {
-            graph.at(j).push_back(i);
+            symmetric.at(j).push_back(i);
         }
     }
 
-    for (auto& vec : graph) {
+    for (auto& vec : symmetric) {
         std::sort(std::begin(vec), std::end(vec));
     }
+
+    return symmetric;
 }
+
+Game::Game(const Cell base) {
+    graph = gen_graph(base);
+}
+
