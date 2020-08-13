@@ -80,7 +80,87 @@ static std::vector<std::vector<Cell>> gen_graph(const Cell base) {
     return symmetric;
 }
 
-Game::Game(const Cell base) {
-    graph = gen_graph(base);
+// Rotate 1/3 the way around CW
+static std::vector<Cell> rotate(const std::vector<Cell>& board, const Cell base) {
+
+    std::vector<Cell> rotated = board;
+
+    // right -> bottom
+    // bottom -> left
+    // left -> right
+    for (Cell ring = 2; ring <= base; ++ring) {
+
+        const auto top = top_cell(ring);
+        const auto right = right_cell(ring);
+        const auto left = left_cell(ring);
+
+        // The number of cells in a single side of the ring
+        const Cell side = ring - 1;
+
+        for (Cell i = 0; i < side; ++i) {
+            rotated.at(right + i) = board.at(top + i);
+            rotated.at(left + i) = board.at(right + i);
+            rotated.at(top + i) = board.at(left + i);
+        }
+    }
+
+    return rotated;
 }
 
+// Reflect the board along the line of symmetry passing through the top node
+static std::vector<Cell> reflect(const std::vector<Cell>& board, const Cell base) {
+
+    std::vector<Cell> reflected = board;
+
+    for (Cell ring = 2; ring <= base; ++ring) {
+
+        const auto right = right_cell(ring);
+        const auto left = left_cell(ring);
+
+        // The number of cells in a single side of the ring
+        const Cell side = ring - 1;
+
+        // Swap the left and right sides
+        for (Cell i = 0; i < side; ++i) {
+            reflected.at(left + i) = board.at(right - i);
+            reflected.at(right - i) = board.at(left + i);
+        }
+
+        // Half the number of cells on the bottom, excluding left and right, rounded down
+        const Cell half = (side - 1) / 2;
+
+        // Now reflect the rest of the bottom side in itself
+        // We start at 1 here to prevent swapping the left and right nodes again
+        for (Cell i = 1; i <= half; ++i) {
+            reflected.at(left - i) = board.at(right + i);
+            reflected.at(right + i) = board.at(left - i);
+        }
+    }
+
+    return reflected;
+}
+
+// Generate the non-trivial permutations of the board
+static std::vector<std::vector<Cell>> gen_perms(const Cell base) {
+
+    std::vector<Cell> id{};
+    id.resize(board_size(base));
+
+    for (Cell i = 0; i < id.size(); ++i) {
+        id.at(i) = i;
+    }
+
+    const auto rot = rotate(id, base);
+    const auto rotrot = rotate(rot, base);
+
+    const auto ref = reflect(id, base);
+    const auto rotref = rotate(ref, base);
+    const auto rotrotref = rotate(rotref, base);
+
+    return {rot, rotrot, ref, rotref, rotrotref};
+}
+
+Game::Game(const Cell base) {
+    graph = gen_graph(base);
+    perms = gen_perms(base);
+}
