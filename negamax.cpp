@@ -5,7 +5,6 @@
 #include <map>
 #include <utility>
 
-// TODO: we might be able to represent the board as an integer, which may make things easier
 static std::vector<Player> min_perm(const std::vector<Player>& board, const Game& game) {
 
     auto min = board;
@@ -54,8 +53,51 @@ static Outcome negamax(const State& state, const Game& game, const Player player
     // Undoing moves is tricky because of union-find, so just create a copy
     // of the state for the child.
     State child = state;
+    for (Cell cell = 0; cell < state.board.size(); ++cell) {
+
+        if (state.board.at(cell).player == Player::None) {
+
+            child = state;
+            child.move(game, player, cell);
+
+            // Normally we check if the game is finished at the start of this function
+            // but this is more efficient since we can check immediately if the game is over
+            if (child.won(cell)) {
+                return Outcome::Win;
+            }
+
+            const auto outcome = negamax(child, game, !player);
+
+            // If this is a losing position for the other player, then we won.
+            if (outcome == Outcome::Lose) {
+                return Outcome::Win;
+            }
+        }
+    }
+
+    return Outcome::Lose;
+}
+
+static uint32_t count_moves(const State& state) {
+    uint32_t moves = 0;
+    for (Cell cell = 0; cell < state.board.size(); ++cell) {
+        if (state.board.at(cell).player == Player::None) {
+            ++moves;
+        }
+    }
+    return moves;
+}
+
+static Outcome negamax_prune(const State& state, const Game& game, const Player player) {
+
+    const auto tot_moves = count_moves(state);
+
+    // Undoing moves is tricky because of union-find, so just create a copy
+    // of the state for the child.
+    State child = state;
 
     const auto moves = unique_moves(state, game, player);
+
     for (const auto& p : moves) {
         const auto cell = p.second;
 
@@ -68,10 +110,16 @@ static Outcome negamax(const State& state, const Game& game, const Player player
             return Outcome::Win;
         }
 
-        const auto value = negamax(child, game, !player);
+        Outcome outcome;
+        if (moves.size() == tot_moves) {
+            // No isomorphic moves were pruned, so skip checking from now on
+            outcome = negamax(child, game, !player);
+        } else {
+            outcome = negamax_prune(child, game, !player);
+        }
 
         // If this is a losing position for the other player, then we won.
-        if (value == Outcome::Lose) {
+        if (outcome == Outcome::Lose) {
             return Outcome::Win;
         }
     }
@@ -81,11 +129,15 @@ static Outcome negamax(const State& state, const Game& game, const Player player
 
 Outcome winning_outcome(const State& state, const Game& game, const Player player) {
 
+    // The number of empty moves: this determines how deep down the tree we will go
+    const auto tot_moves = count_moves(state);
+
     // Undoing moves is tricky because of union-find, so just create a copy
     // of the state for the child.
     State child = state;
 
     const auto moves = unique_moves(state, game, player);
+
     for (const auto& p : moves) {
         const auto cell = p.second;
 
@@ -101,7 +153,12 @@ Outcome winning_outcome(const State& state, const Game& game, const Player playe
         if (child.won(cell)) {
             outcome = Outcome::Win;
         } else {
-            outcome = -negamax(child, game, !player);
+            if (moves.size() == tot_moves) {
+                // No isomorphic moves were pruned, so skip
+                outcome = -negamax(child, game, !player);
+            } else {
+                outcome = -negamax_prune(child, game, !player);
+            }
         }
 
         std::cout << outcome << std::endl;
