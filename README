@@ -3,3 +3,9 @@ To print out the winning moves for a board configuration,
 
 make
 ./solve --base=4 --player=black --board="W0 B3 W4 B5 W7"
+
+TODO
+- recognizing captured cells
+- recognizing inferior cells
+- adding some vcs to the connectivity engine
+- adding mustplay reasoning
