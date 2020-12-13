@@ -1,8 +1,10 @@
 A solver for geodesic Y, based on the implementation from OpenSpiel.
-To print out the winning moves for a board configuration,
 
 make
+# by default only prints out the first winning move
 ./solve --base=4 --player=black --board="W0 B3 W4 B5 W7"
+# use --moves to print out all winning moves
+./solve --base=4 --player=black --board="W0 B3 W4 B5 W7" --moves
 
 TODO
 - recognizing captured cells
