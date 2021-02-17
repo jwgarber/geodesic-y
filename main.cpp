@@ -104,6 +104,13 @@ int main(const int argc, const char* argv[]) {
                 board_str = arg.substr(8);
             } else if (arg == "--moves") {
                 moves = true;
+            } else if (arg == "-h" || arg == "--help") {
+                std::cout << "Usage: " << argv[0] << " [options]" << std::endl
+                          << "--base=N                  The size of the base of the board (default: 3)" << std::endl
+                          << "--player={black,white}    The player to go first (default: black)" << std::endl
+                          << "--board='B1 W3 B5'        The initial board state (default: empty)" << std::endl
+                          << "--moves                   Show all winning moves (default: show only a single winning move, if any)" << std::endl;
+                return EXIT_SUCCESS;
             } else {
                 throw std::runtime_error("unknown argument: " + arg);
             }
