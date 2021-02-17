@@ -5,13 +5,13 @@
 #include <map>
 #include <utility>
 
-static std::vector<Player> min_perm(const std::vector<Player>& board, const Game& game) {
+static std::vector<Player> min_perm(const std::vector<Player>& board, const YGame& game) {
 
     auto min = board;
 
     std::vector<Player> newboard{board.size()};
 
-    for (const auto& perm : game.perms) {
+    for (const auto& perm : game.perms()) {
 
         for (Cell cell = 0; cell < board.size(); ++cell) {
             newboard.at(perm.at(cell)) = board.at(cell);
@@ -25,7 +25,7 @@ static std::vector<Player> min_perm(const std::vector<Player>& board, const Game
     return min;
 }
 
-static std::map<std::vector<Player>, Cell> unique_moves(const State& state, const Game& game, const Player player) {
+static std::map<std::vector<Player>, Cell> unique_moves(const State& state, const YGame& game, const Player player) {
 
     // Copy the current players into a vector
     std::vector<Player> board{state.board.size()};
@@ -48,7 +48,7 @@ static std::map<std::vector<Player>, Cell> unique_moves(const State& state, cons
     return moves;
 }
 
-static Outcome negamax(const State& state, const Game& game, const Player player) {
+static Outcome negamax(const State& state, const YGame& game, const Player player) {
 
     // Undoing moves is tricky because of union-find, so just create a copy
     // of the state for the child.
@@ -88,7 +88,7 @@ static uint32_t count_moves(const State& state) {
     return moves;
 }
 
-static Outcome negamax_prune(const State& state, const Game& game, const Player player) {
+static Outcome negamax_prune(const State& state, const YGame& game, const Player player) {
 
     const auto tot_moves = count_moves(state);
 
@@ -127,7 +127,7 @@ static Outcome negamax_prune(const State& state, const Game& game, const Player 
     return Outcome::Lose;
 }
 
-Outcome winning_outcome(const State& state, const Game& game, const Player player) {
+Outcome winning_outcome(const State& state, const YGame& game, const Player player) {
 
     // The number of empty moves: this determines how deep down the tree we will go
     const auto tot_moves = count_moves(state);
@@ -172,7 +172,7 @@ Outcome winning_outcome(const State& state, const Game& game, const Player playe
     return Outcome::Lose;
 }
 
-std::vector<Cell> winning_moves(const State& state, const Game& game, const Player player) {
+std::vector<Cell> winning_moves(const State& state, const YGame& game, const Player player) {
 
     const auto lambda = [&](const Cell cell) {
 

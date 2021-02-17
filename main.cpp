@@ -2,6 +2,7 @@
 #include <string>
 
 #include "cell.hpp"
+#include "geodesic.hpp"
 #include "negamax.hpp"
 #include "state.hpp"
 #include "util.hpp"
@@ -34,11 +35,11 @@ static Player parse_player(const std::string& player_str) {
     }
 }
 
-static State parse_board(const Cell base, const Game& game, const std::string& board_str) {
+static State parse_board(const YGame& game, const std::string& board_str) {
 
-    State state{base};
+    State state{game};
 
-    std::vector<Player> board{board_size(base), Player::None};
+    std::vector<Player> board{state.board.size(), Player::None};
 
     const auto moves = split(board_str, ' ');
 
@@ -116,9 +117,9 @@ int main(const int argc, const char* argv[]) {
             }
         }
 
-        const Game game{base};
+        const GeodesicY game{base};
 
-        State state = parse_board(base, game, board_str);
+        State state = parse_board(game, board_str);
 
         std::cout << "Running alpha-beta for " << player
                   << " on base " << static_cast<uint32_t>(base) << " board"

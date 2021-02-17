@@ -1,33 +1,11 @@
 #include "state.hpp"
 
-static Edge get_edge(const Cell cell, const Cell base) {
+State::State(const YGame& game) {
 
-    const auto top = top_cell(base);
-    const auto right = right_cell(base);
-    const auto left = left_cell(base);
-
-    auto edge = Edge::None;
-    if ((top <= cell) && (cell <= right)) {
-        edge |= Edge::Right;
-    }
-
-    if ((right <= cell) && (cell <= left)) {
-        edge |= Edge::Bottom;
-    }
-
-    if ((left <= cell) || (cell == top)) {
-        edge |= Edge::Left;
-    }
-
-    return edge;
-}
-
-State::State(const Cell base) {
-
-    board.resize(board_size(base));
+    board.resize(game.graph().size());
 
     for (Cell cell = 0; cell < board.size(); ++cell) {
-        board.at(cell) = Node(Player::None, cell, 1, get_edge(cell, base));
+        board.at(cell) = Node(Player::None, cell, 1, game.cell_edge(cell));
     }
 }
 
@@ -67,11 +45,11 @@ void State::join(const Cell a, const Cell b) {
     board.at(a_root).edge |= board.at(b_root).edge;
 }
 
-void State::move(const Game& game, const Player player, const Cell cell) {
+void State::move(const YGame& game, const Player player, const Cell cell) {
 
     board.at(cell).player = player;
 
-    for (const auto nhbr : game.graph.at(cell)) {
+    for (const auto nhbr : game.graph().at(cell)) {
         if (board.at(nhbr).player == player) {
             join(cell, nhbr);
         }

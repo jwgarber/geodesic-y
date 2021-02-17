@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "cell.hpp"
-#include "game.hpp"
+#include "ygame.hpp"
 
 struct Node {
     Player player;
@@ -20,11 +20,11 @@ struct Node {
 struct State {
     std::vector<Node> board;
 
-    explicit State(const Cell base);
+    explicit State(const YGame& game);
 
     Cell root(const Cell cell);
     void join(const Cell a, const Cell b);
-    void move(const Game& game, const Player player, const Cell cell);
+    void move(const YGame& game, const Player player, const Cell cell);
     bool won(const Cell cell);
 };
 
