@@ -58,3 +58,15 @@ static inline void operator|=(Edge& lhs, const Edge rhs) {
     lhs = static_cast<Edge>(val);
 }
 
+static inline std::ostream& operator<<(std::ostream& os, const Edge edge) {
+    switch (static_cast<uint8_t>(edge)) {
+        case 0: return os << "none";
+        case 1: return os << "right";
+        case 2: return os << "bottom";
+        case 3: return os << "bottom+right";
+        case 4: return os << "left";
+        case 5: return os << "left+right";
+        case 6: return os << "left+bottom";
+        case 7: return os << "all";
+    }
+}

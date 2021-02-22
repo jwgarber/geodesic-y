@@ -1,10 +1,20 @@
-A solver for geodesic Y, based on the implementation from OpenSpiel.
+A solver for geodesic and custom Y games, based on the implementation from OpenSpiel. Requires a C++11 compiler.
 
 make
 # by default only prints out the first winning move
-./solve --base=4 --player=black --board="W0 B3 W4 B5 W7"
+./solve --game=geodesic --base=4 --player=black --board="W0 B3 W4 B5 W7"
 # use --moves to print out all winning moves
-./solve --base=4 --player=black --board="W0 B3 W4 B5 W7" --moves
+./solve --game=geodesic --base=4 --player=black --board="W0 B3 W4 B5 W7" --moves
+# use a custom Y board by specifying a file
+./solve --game=custom --board-file=sample-board.txt --player=black --board="W0 B1"
+
+Usage: ./solve [options]
+--game={geodesic,custom}  The type of Y game to play (default: geodesic)
+--board='B1 W3 B5'        The initial board state (default: empty)
+--player={black,white}    The player to go first (default: black)
+--moves                   Show all winning moves (default: show only a single winning move, if any)
+--base=N                  The size of the base of the board (geodesic Y only, default: 3)
+--board-file=<path>       Path to the board file (custom Y only, default: sample-board.txt)
 
 TODO
 - recognizing captured cells

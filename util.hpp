@@ -62,3 +62,6 @@ parse_int(const std::string& str) {
 }
 
 std::vector<std::string> split(const std::string& str, const char delim);
+std::string read_file(const std::string& path);
+std::string trim_copy(std::string str);
+std::string replace_copy(std::string str, const std::string& search, const std::string& replace);
